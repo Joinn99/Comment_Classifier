@@ -54,7 +54,7 @@ def autotrain(args):
     if args.usemodel:
         vec_sizes = [-1]
     else:
-        vec_sizes = [80, 84, 88, 92, 96, 100, 104]
+        vec_sizes = [87, 90, 93, 99, 103, 107, 128]
     epoches = args.epoch
     args.epoch = 1
     for size in vec_sizes:
@@ -67,6 +67,9 @@ def autotrain(args):
             info = str('Epoch: ' + str(epoch + 1) + '\tVali Prec: ' + str(vali_precision * 100)[:5]
                        + '%' + '\tTrain Prec: ' + str(train_precision * 100)[:5] + '%')
             print(info)
+            args.usemodel = True
+        args.usemodel = False
+
 
 
 if __name__ == "__main__":
