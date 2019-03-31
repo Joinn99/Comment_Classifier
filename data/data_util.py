@@ -27,14 +27,19 @@ def word2vec(data_set, vec_size, windows, epoch):
     del model
 
 
-def doc2vec(data_set, vec_size, windows, epoch):
+def doc2vec(data_set, vec_size, windows, epoch, use_model):
     doc = [TaggedDocument(doc, [i]) for i, doc in enumerate(data_set)]
-    model_dm = Doc2Vec(min_count=2, window=windows, vector_size=vec_size,
-                       sample=1e-3, negative=5, workers=4, epochs=epoch)
-    model_dbow = Doc2Vec(min_count=2, window=windows, vector_size=vec_size,
-                         sample=1e-3, negative=5, workers=4, dm=0, epochs=epoch)
-    model_dm.build_vocab(doc)
-    model_dbow.build_vocab(doc)
+    if use_model:
+        model_dbow = Doc2Vec.load('model/dbow.model')
+        model_dm = Doc2Vec.load('model/dm.model')
+    else:
+        model_dm = Doc2Vec(min_count=2, window=windows, vector_size=vec_size,
+                           sample=1e-3, negative=5, workers=4, epochs=epoch)
+        model_dbow = Doc2Vec(min_count=2, window=windows, vector_size=vec_size,
+                             sample=1e-3, negative=5, workers=4, dm=0, epochs=epoch)
+        model_dm.build_vocab(doc)
+        model_dbow.build_vocab(doc)
+
     model_dm.train(
         documents=doc, total_examples=model_dm.corpus_count, epochs=model_dm.epochs)
     model_dbow.train(
@@ -46,7 +51,8 @@ def doc2vec(data_set, vec_size, windows, epoch):
 
 def doc_data_convert(data_set, test_set, vec_size):
     vec_dbow = Doc2Vec.load('model/dbow.model')
-    vec_dm = Doc2Vec.load('model/dbow.model')
+    vec_dm = Doc2Vec.load('model/dm.model')
+    vec_size = vec_dm.vector_size
     data_array = np.zeros([len(data_set), 2 * vec_size])
     test_array = np.zeros([len(test_set), 2 * vec_size])
     offset = len(data_set)
